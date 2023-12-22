@@ -1,0 +1,40 @@
+.card {
+  width: 25vw;
+  height: 86vh;
+  padding: 18px;
+}
+
+.card .card_name {
+  height: 5%;
+}
+
+.card .actions_con {
+  height: 95%;
+}
+.card .actions_con,
+.deatails__Fld,
+.text__Fld {
+  width: 100%;
+}
+
+.card .actions_con {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.text__Fld:focus {
+  border: 5px solid black;
+}
+
+@media screen and (min-width: 600px) and (max-width: 1100px) {
+  .card {
+    width: 50vw;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .card {
+    width: 80vw;
+  }
+}

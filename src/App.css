@@ -1,0 +1,49 @@
+.screen {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  white-space: nowrap;
+}
+
+.header {
+  background-color: #383838;
+  height: 10vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+.sideBar {
+  margin-top: 10vh;
+  background-color: #383838;
+  height: 90vh;
+}
+
+.main {
+  margin-top: 10vh;
+  background-color: #e0e0e0;
+  border: 1px solid rgb(173, 173, 173);
+  height: 90vh;
+}
+
+button {
+  cursor: pointer;
+}
+
+@media screen and (max-width: 800px) {
+  .screen {
+    grid-template-columns: 1fr; /* Only one column for mobile view */
+    padding: 0;
+  }
+
+  .sideBar {
+    display: none;
+  }
+
+  .main {
+    border-radius: 0;
+    border: none;
+    width: 100vw;
+    overflow-y: scroll;
+  }
+}

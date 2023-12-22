@@ -1,0 +1,76 @@
+.header_con {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  height: 100%;
+}
+
+.menu_con {
+  display: none;
+}
+
+.title_con {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+}
+
+.title_con .dressCode_logo {
+  margin-left: 4vw;
+}
+
+.title_con h2 {
+  font-size: small;
+}
+
+.user_con {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-right: 2vw;
+}
+.side_nav {
+  position: fixed;
+  top: 0;
+  left: 0; /* Start from the left */
+  width: 0; /* Initially hidden width */
+  height: 100%;
+  background-color: #383838;
+  transition: width 0.3s ease; /* Smooth transition effect */
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+.side_nav.open {
+  width: 90%; /* Expanded width when the .open class is present */
+}
+
+@media screen and (min-width: 800px) and (max-width: 1200px) {
+  .search_input {
+    width: 200px;
+  }
+}
+@media screen and (max-width: 800px) {
+  .header_con {
+    grid-template-columns: 1fr;
+    height: 100%;
+  }
+  .menu_con {
+    display: grid;
+    grid-template-columns: 1fr 5fr;
+    align-items: center;
+    order: -2;
+  }
+  .menu_con .menu_icon {
+    margin-left: 2vw;
+  }
+  .menu_con .dressCode_logo {
+    justify-self: center
+  }
+  .title_con {
+    display: none;
+  }
+}

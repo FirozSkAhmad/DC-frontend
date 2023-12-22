@@ -1,0 +1,59 @@
+.sideNav_con {
+  height: 100vh;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  z-index: 100;
+}
+
+.closeBtn_con {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Routes_con {
+  height: 44%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sideNav_con .categories_con {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.sideNav_con .categories_con .category,
+.sideNav_con .logout_con {
+  display: flex;
+  gap: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.sideNav_con .categories_con .category img,
+.logout_con img {
+  width: 20px;
+  height: 20px;
+}
+
+.sideNav_con .logout_con {
+  gap: 80px;
+}
+
+.category:hover {
+  background-color: gray;
+}
+
+.logout_con:hover {
+  background-color: gray;
+  border-radius: 5px;
+}

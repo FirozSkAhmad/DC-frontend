@@ -207,8 +207,8 @@ const Overview = () => {
             }}
           >
             <div className="onlOverview_con">
-              <h2 className="font-bold text-xl">Online Overview</h2>
-              <h4 className="font-bold text-10">
+              <h2 className="font-medium text-xl">Online Overview</h2>
+              <h4 className="font-medium text-10">
                 Total Sales : ₹{onlineSales}
               </h4>
             </div>
@@ -222,8 +222,8 @@ const Overview = () => {
             }}
           >
             <div className="offOverview_con">
-              <h2 className="font-bold text-xl">Offline Overview</h2>
-              <h4 className="font-bold text-10">
+              <h2 className="font-medium text-xl">Offline Overview</h2>
+              <h4 className="font-medium text-10">
                 Total Sales : ₹{offlineSales}
               </h4>
             </div>
@@ -250,7 +250,7 @@ const Overview = () => {
             </div>
             <div className="onData_box">
               <div className="heading_con">
-                <h2 className="font-bold text-xl">Online Sales Data</h2>
+                <h2 className="font-medium text-xl">Online Sales Data</h2>
               </div>
               <div className="orders_box">
                 <div className="orders_con">
@@ -400,7 +400,7 @@ const Overview = () => {
           <>
             <div className="offData_box">
               <div className="heading_con">
-                <h2 className="font-bold text-xl">Offline Sales Data</h2>
+                <h2 className="font-medium text-xl">Offline Sales Data</h2>
               </div>
               <div className="orders_box">
                 <div className="bg-grey-500 w-full h-full">

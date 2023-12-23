@@ -134,7 +134,7 @@ const Stores = () => {
       </div>
       <div className="storesData_box">
         <div className="heading_con">
-          <h2>Stores</h2>
+          <h2 className="font-medium text-xl">Stores</h2>
         </div>
         <div className="stores_box">
           <div className="stores_con">

@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import SideNav from "./SideNav";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import closeIcon from "../../utils/closeIcon.svg";
 
 const Stores = () => {
   const { setLoader, token, isSideNavOpen } = useContext(sharedContext);
@@ -149,12 +150,12 @@ const Stores = () => {
                       <p className="noWhiteSpace">{storeData?.storeName}</p>
                     </div>
                     {selectedClient === index && (
-                      <button
-                        className="bg-red-500 text-white px-2 py-1 rounded-md"
+                      <img
+                        src={closeIcon}
+                        alt="closeIcon"
                         onClick={handleCloseClick}
-                      >
-                        Close
-                      </button>
+                        className="w-5 cursor-pointer"
+                      />
                     )}
                   </div>
                   {selectedClient === index && (

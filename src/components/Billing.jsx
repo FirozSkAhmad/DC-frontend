@@ -54,7 +54,7 @@ const Billing = () => {
       // Fetch product name based on selected part number
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/getProductSubEntites/${value}`,
+          `${import.meta.env.VITE_BASE_URL}/admin/getProductSubEntites/${value}`,
           requestOptions
         );
         if (response.ok) {

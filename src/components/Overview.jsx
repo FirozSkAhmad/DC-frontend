@@ -5,7 +5,7 @@ import sharedContext from "../context/SharedContext";
 import uploadIcon from "../../utils/uploadIcon.svg";
 import Loader from "./Loader";
 import SideNav from "./SideNav";
-import toast from "react-hot-toast";
+import closeIcon from "../../utils/closeIcon.svg";
 
 const Overview = () => {
   const { setLoader, token, isSideNavOpen } = useContext(sharedContext);
@@ -45,7 +45,7 @@ const Overview = () => {
   useEffect(() => {
     getOrders();
     getTotalSales();
-  }, []);
+  }, [token]);
 
   const getOrders = () => {
     setLoader(true);
@@ -58,7 +58,10 @@ const Overview = () => {
       redirect: "follow",
     };
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/orders/getOrders/Shopify`, requestOptions)
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/orders/getOrders/Shopify`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         console.log(result.data);
@@ -72,7 +75,10 @@ const Overview = () => {
         setLoader(false);
       });
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/getAllOfflineStores`, requestOptions)
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/orders/getAllOfflineStores`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         console.log(result.data);
@@ -98,7 +104,10 @@ const Overview = () => {
       redirect: "follow",
     };
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/orders/getTotalOnlineSales`, requestOptions)
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/orders/getTotalOnlineSales`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         if (result.status == 200) {
@@ -109,7 +118,10 @@ const Overview = () => {
         console.log("error", error.message);
       });
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/orders/getTotalOfflineSales`, requestOptions)
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/orders/getTotalOfflineSales`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         if (result.status == 200) {
@@ -169,7 +181,7 @@ const Overview = () => {
 
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `store_${orderData.store_name}_orders.csv`);
+    link.setAttribute("download", `${orderData.store_name}_orders.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -195,8 +207,10 @@ const Overview = () => {
             }}
           >
             <div className="onlOverview_con">
-              <h2>Online Overview</h2>
-              <h4>Total Sales : ₹{onlineSales}</h4>
+              <h2 className="font-bold text-xl">Online Overview</h2>
+              <h4 className="font-bold text-10">
+                Total Sales : ₹{onlineSales}
+              </h4>
             </div>
           </button>
         }
@@ -208,8 +222,10 @@ const Overview = () => {
             }}
           >
             <div className="offOverview_con">
-              <h2>Offline Overview</h2>
-              <h4>Total Sales : ₹{offlineSales}</h4>
+              <h2 className="font-bold text-xl">Offline Overview</h2>
+              <h4 className="font-bold text-10">
+                Total Sales : ₹{offlineSales}
+              </h4>
             </div>
           </button>
         }
@@ -234,7 +250,7 @@ const Overview = () => {
             </div>
             <div className="onData_box">
               <div className="heading_con">
-                <h2>Online Sales Data</h2>
+                <h2 className="font-bold text-xl">Online Sales Data</h2>
               </div>
               <div className="orders_box">
                 <div className="orders_con">
@@ -252,12 +268,12 @@ const Overview = () => {
                             </p>
                           </div>
                           {selectedClient === index && (
-                            <button
-                              className="bg-red-500 text-white px-2 py-1 rounded-md"
+                            <img
+                              src={closeIcon}
+                              alt="closeIcon"
                               onClick={handleCloseClick}
-                            >
-                              Close
-                            </button>
+                              className="w-5 cursor-pointer"
+                            />
                           )}
                         </div>
                         {selectedClient === index &&
@@ -384,7 +400,7 @@ const Overview = () => {
           <>
             <div className="offData_box">
               <div className="heading_con">
-                <h2>Offline Sales Data</h2>
+                <h2 className="font-bold text-xl">Offline Sales Data</h2>
               </div>
               <div className="orders_box">
                 <div className="bg-grey-500 w-full h-full">
@@ -417,13 +433,13 @@ const Overview = () => {
                               </div>
                             </div>
                             {selectedClient === index && (
-                              <div className="flex flex-col gap-5">
-                                <button
-                                  className="bg-red-500 text-white px-2 py-1 rounded-md"
+                              <div className="flex flex-col gap-5 items-center">
+                                <img
+                                  src={closeIcon}
+                                  alt="closeIcon"
                                   onClick={handleCloseClick}
-                                >
-                                  Close
-                                </button>
+                                  className="w-5 cursor-pointer"
+                                />
                                 <button
                                   className="bg-blue-500 text-white px-2 py-1 rounded-md"
                                   onClick={() => handleExportClick(orderData)}

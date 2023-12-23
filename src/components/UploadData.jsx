@@ -57,8 +57,18 @@ function UploadData({
             if (result.status == 500) {
               setLoader(false);
               handleClose();
-              console.log(result.error)
+              console.log(result.error);
               alert(result.error);
+            } else if (result.status == 400) {
+              setLoader(false);
+              handleClose();
+              setFile("");
+              setFileName("");
+              if (userRole === "SUPER ADMIN") {
+                getOrders();
+                getTotalSales();
+              }
+              alert(result.message);
             } else {
               setLoader(false);
               handleClose();
@@ -77,15 +87,33 @@ function UploadData({
             toast.error("Error while uploading data");
           });
       } else {
-        fetch(`${import.meta.env.VITE_BASE_URL}/upload/bulkUploadProducts`, requestOptions)
+        fetch(
+          `${import.meta.env.VITE_BASE_URL}/upload/bulkUploadProducts`,
+          requestOptions
+        )
           .then((response) => response.json())
           .then((result) => {
-            getProducts();
-            setLoader(false);
-            handleClose();
-            setFile("");
-            setFileName("");
-            alert(result.message);
+            if (result.status == 500) {
+              setLoader(false);
+              handleClose();
+              console.log(result.error);
+              alert(result.error);
+            } else if (result.status == 400) {
+              getProducts();
+              setLoader(false);
+              handleClose();
+              setFile("");
+              setFileName("");
+              alert(result.message);
+            }
+            else{
+              getProducts();
+              setLoader(false);
+              handleClose();
+              setFile("");
+              setFileName("");
+              toast.success(result.message);
+            }
           })
           .catch((error) => {
             console.log("error", error);
@@ -100,7 +128,7 @@ function UploadData({
     <div className="uploadCard">
       <Loader />
       <div className="card_name">
-        <h2>Upload CSV File</h2>
+        <h2 className="font-bold text-20">Upload CSV File</h2>
       </div>
       <div className="actions_con">
         <div className="browseFile_con">

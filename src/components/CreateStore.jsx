@@ -103,7 +103,7 @@ const CreateStore = ({ handleClose, getAllStores }) => {
     <div className="card">
       <Loader />
       <div className="card_name">
-        <h2>Create Store</h2>
+        <h2 className="font-bold text-20">Create Store</h2>
       </div>
       <div className="actions_con">
         <div className="deatails__Fld">

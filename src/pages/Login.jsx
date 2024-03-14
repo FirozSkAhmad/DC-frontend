@@ -8,12 +8,13 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 const Login = () => {
-  const { setUserRole, setToken, setLoader } = useContext(sharedContext);
+  const { setUserRole, setToken, setLoader, setEmailId } =
+    useContext(sharedContext);
 
   const [showPassword, setShowPassword] = useState(false);
 
   const handleTogglePasswordVisibility = (event) => {
-    event.preventDefault();  // Prevent the default form submit action
+    event.preventDefault(); // Prevent the default form submit action
     setShowPassword(!showPassword);
   };
 
@@ -36,7 +37,7 @@ const Login = () => {
   };
 
   const handleSubmit = (e) => {
-    console.log("clicked handle submit")
+    console.log("clicked handle submit");
     e.preventDefault();
     setLoader(true);
     if (!formData.emailId || !formData.password || !formData.login_type) {
@@ -66,6 +67,7 @@ const Login = () => {
         } else {
           setUserRole(result.data.role_type);
           setToken(result.data.accessToken);
+          setEmailId(result.data.email);
           sessionStorage.setItem("token", result.data.accessToken);
           sessionStorage.setItem("userRole", result.data.role_type);
           if (result.data.role_type === "CLIENT") {

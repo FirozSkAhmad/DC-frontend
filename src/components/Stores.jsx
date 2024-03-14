@@ -88,13 +88,13 @@ const Stores = () => {
     var raw = JSON.stringify({ storeId });
 
     var requestOptions = {
-      method: "POST",
+      method: "PUT",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
 
-    fetch(`${import.meta.env.VITE_BASE_URL}admin/deleteStore`, requestOptions)
+    fetch(`${import.meta.env.VITE_BASE_URL}/admin/deleteStore`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);

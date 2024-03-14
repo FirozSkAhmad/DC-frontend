@@ -3,7 +3,6 @@ import React, { useState, useContext } from "react";
 import sharedContext from "../context/SharedContext";
 import Loader from "./Loader";
 import toast from "react-hot-toast";
-
 function UploadData({
   handleClose,
   type,

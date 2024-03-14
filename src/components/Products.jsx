@@ -29,8 +29,8 @@ const Products = () => {
       headerAlign: "center",
     },
     {
-      field: "subEntity",
-      headerName: "Sub Entity",
+      field: "size",
+      headerName: "Size",
       width: 150,
       editable: false,
       align: "center",
@@ -38,7 +38,16 @@ const Products = () => {
     },
     {
       field: "MRP",
-      headerName: "MRP/Pc",
+      headerName: "MRP",
+      type: "number",
+      width: 150,
+      editable: false,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "quantity",
+      headerName: "Quantity",
       type: "number",
       width: 150,
       editable: false,

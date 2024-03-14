@@ -8,17 +8,24 @@ import { TextField, Autocomplete } from "@mui/material";
 import toast from "react-hot-toast";
 
 const Billing = () => {
-  const { userRole, isSideNavOpen, setLoader, token } =
+  const { userRole, isSideNavOpen, setLoader, token, emailId } =
     useContext(sharedContext);
 
   const clientName = sessionStorage.getItem("clientName");
   const storeName = sessionStorage.getItem("storeName");
 
   const [availableProductsNms, setAvailableProductsNms] = useState([]);
-  const [availableSubEntites, setAvailableSubEntites] = useState([]);
+  const [availableSizes, setAvailableSizes] = useState([]);
 
   const [products, setProducts] = useState([
-    { productId: "", productName: "", subEntity: "", quantity: "", price: "" },
+    {
+      productId: "",
+      productName: "",
+      size: "",
+      quantity: "",
+      price: "",
+      presentQuantity: "",
+    },
   ]);
 
   const [totalPrice, setTotalPrice] = useState(0);
@@ -29,9 +36,10 @@ const Billing = () => {
       {
         productId: "",
         productName: "",
-        subEntity: "",
+        size: "",
         quantity: "",
         price: "",
+        presentQuantity: "",
       },
     ]);
     toast.success("Added new product row");
@@ -39,6 +47,13 @@ const Billing = () => {
 
   const handleProductChange = async (index, fieldName, value) => {
     const updatedProducts = [...products];
+    if (fieldName === "quantity") {
+      if (value > updatedProducts[index].presentQuantity) {
+        alert(
+          `Only ${updatedProducts[index].presentQuantity} items are available in stock for this product`
+        );
+      }
+    }
     updatedProducts[index][fieldName] = value;
 
     var myHeaders = new Headers();
@@ -52,37 +67,68 @@ const Billing = () => {
 
     if (fieldName === "productName") {
       // Fetch product name based on selected part number
+      setLoader(true);
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/admin/getProductSubEntites/${value}`,
+          `${import.meta.env.VITE_BASE_URL}/admin/getProductSizes/${value}`,
           requestOptions
         );
         if (response.ok) {
           const obj = await response.json();
-          updatedProducts[index].subEntity = "";
+          updatedProducts[index].size = "";
           updatedProducts[index].productId = "";
-          setAvailableSubEntites(obj.data);
+          updatedProducts[index].quantity = "";
+          updatedProducts[index].price = "";
+          setAvailableSizes(obj.data);
+          setLoader(false);
         } else {
-          console.error("Failed to fetch SubEntites");
+          console.error("Failed to fetch Sizes");
+          setLoader(false);
         }
       } catch (error) {
         console.error("Error:", error);
+        setLoader(false);
       }
     }
 
-    if (fieldName === "subEntity") {
+    if (fieldName === "size") {
       // Fetch product name based on selected part number
-      // console.log(updatedProducts[index].productName, value);
       try {
+        setLoader(true);
+        // Initial fetch to get Product ID based on name and size
         const response = await fetch(
-          `${import.meta.env.VITE_BASE_URL}/admin/getProductIdByProductNameAndSubEntity/${updatedProducts[index].productName}/${value}`,
+          `${
+            import.meta.env.VITE_BASE_URL
+          }/admin/getProductIdByProductNameAndSize/${
+            updatedProducts[index].productName
+          }/${value}`,
           requestOptions
         );
         if (response.ok) {
           const obj = await response.json();
+          updatedProducts[index].productId = "";
+          updatedProducts[index].quantity = "";
+          updatedProducts[index].price = "";
           updatedProducts[index].productId = obj.productId;
+          // Use a different variable or reuse the same variable for a new request
+          const result = await fetch(
+            `${
+              import.meta.env.VITE_BASE_URL
+            }/admin/getPriceAndQuantityByProductId/${obj.productId}`,
+            requestOptions
+          );
+          if (result.ok) {
+            const data = await result.json();
+            updatedProducts[index].price = data.MRP;
+            updatedProducts[index].presentQuantity = data.quantity;
+            setLoader(false);
+          } else {
+            setLoader(false);
+            throw new Error("Failed to fetch product price");
+          }
         } else {
-          console.error("Failed to fetch product name");
+          setLoader(false);
+          throw new Error("Failed to fetch product ID");
         }
       } catch (error) {
         console.error("Error:", error);
@@ -149,9 +195,10 @@ const Billing = () => {
       {
         productId: "",
         productName: "",
-        subEntity: "",
+        size: "",
         quantity: "",
         price: "",
+        presentQuantity: "",
       },
     ]);
     setTotalPrice(0);
@@ -167,90 +214,159 @@ const Billing = () => {
   const submitBill = async (event) => {
     event.preventDefault();
     try {
-      const convertedProducts = products.map((product) => {
-        return {
-          quantity: parseInt(product.quantity) || 0, // Assuming order_qty is a string representing an integer
-          description: product.productName || "Product", // Assuming a default description if none is provided
-          "tax-rate": 6, // Assuming a fixed tax rate of 6%
-          price: parseFloat(product.price) || 0.0, // Assuming price is a string representing a float
-        };
+      console.log("clicked submit button");
+      setLoader(true);
+      // This array will store the productIds of products where quantity > presentQuantity
+      let productsWithExcessQuantity = [];
+
+      products.forEach((product) => {
+        // Parse the quantity and presentQuantity to numbers
+        const quantity = parseInt(product.quantity, 10);
+        const presentQuantity = parseInt(product.presentQuantity, 10);
+
+        // Check if quantity is greater than presentQuantity
+        if (quantity > presentQuantity) {
+          // Add productId to the array
+          productsWithExcessQuantity.push(product.productId);
+        }
       });
 
-      const currentDate = new Date();
-      const formattedCurrentDate = formatDate(currentDate);
-
-      const data = {
-        // Your own data
-        sender: {
-          company: "Sample Corp",
-          address: "Sample Street 123",
-          zip: "1234 AB",
-          city: "Sampletown",
-          country: "Samplecountry",
-        },
-        // Your recipient
-        client: {
-          company: "Client Corp",
-          address: "Clientstreet 456",
-          zip: "4567 CD",
-          city: "Clientcity",
-          country: "Clientcountry",
-        },
-        information: {
-          // Invoice number
-          number: "2021.0001",
-          // Invoice data
-          date: formattedCurrentDate,
-          // Invoice due date
-        },
-        // The products you would like to see on your invoice
-        // Total values are being calculated automatically
-        products: convertedProducts,
-        // The message you would like to display on the bottom of your invoice
-        "bottom-notice": "Kindly pay your invoice within 15 days.",
-        // Settings to customize your invoice
-        settings: {
-          currency: "INR",
-        },
-      };
-      setLoader(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/billing/createNewBill`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            storeName: storeName,
-            clientName: clientName,
-            products: products,
-            orderedDate: formattedCurrentDate,
-            totalPrice: totalPrice,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        // Handle success
-        console.log("Bill created successfully");
-        const result = await easyinvoice.createInvoice(data);
-        easyinvoice.download("myInvoice.pdf", result.pdf);
+      // Check if there are any products with excess quantity and send a combined message
+      if (productsWithExcessQuantity.length > 0) {
         setLoader(false);
-        toast.success("Invoice downloaded successfully");
-        clearFields();
+        // Join the productIds into a single string for the message
+        const productIdsString = productsWithExcessQuantity.join(", ");
+        alert(
+          `Product IDs with quantity greater than present quantity: ${productIdsString}`
+        );
+        // Here you can handle the combined alert, such as sending an email or a notification
       } else {
-        // Handle error
-        console.error("Failed to create bill");
-        toast.error("Error in Billing");
-        clearFields();
-        setLoader(false);
+        console.log("No products have quantity greater than present quantity.");
+
+        const convertedProducts = products.map((product) => {
+          return {
+            quantity: parseInt(product.quantity) || 0, // Assuming quantity is a string representing an integer
+            description: product.productName || "Product", // Assuming a default description if none is provided
+            // "tax-rate": 6, // Assuming a fixed tax rate of 6%
+            price: parseFloat(product.price) || 0.0, // Assuming price is a string representing a float
+          };
+        });
+
+        const currentDate = new Date();
+        const formattedCurrentDate = formatDate(currentDate);
+
+        const data = {
+          // Your own data
+          sender: {
+            company: "DressCode",
+            // address: "Sample Street 123",
+            // zip: "1234 AB",
+            // city: "Sampletown",
+            // country: "Samplecountry",
+          },
+          // Your recipient
+          client: {
+            company: "Raj Selections",
+            address: "Address:-Opp IB, Zaheerabad,502220.",
+            zip: "Email ID:- madhurjhaver@gmail.com",
+            city: "9290466004",
+            country: "GST No:- 36AESPJ6764L1ZN",
+          },
+          information: {
+            // Invoice number
+            number: "2021.0001",
+            // Invoice data
+            date: formattedCurrentDate,
+            // Invoice due date
+          },
+          // The products you would like to see on your invoice
+          // Total values are being calculated automatically
+          products: convertedProducts,
+          // The message you would like to display on the bottom of your invoice
+          "bottom-notice": "Kindly pay your invoice within 15 days.",
+          // Settings to customize your invoice
+          settings: {
+            currency: "INR",
+          },
+        };
+        const response = await fetch(
+          `${import.meta.env.VITE_BASE_URL}/billing/createNewBill`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              storeName: storeName,
+              clientName: clientName,
+              products: products,
+              orderedDate: formattedCurrentDate,
+              totalPrice: totalPrice,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          // Handle success
+          const responseBody = await response.json();
+          console.log("Bill created successfully");
+          data.information.number = "RAJ000" + responseBody.orderId;
+          const result = await easyinvoice.createInvoice(data);
+          const pdfBlob = b64toBlob(result.pdf, "application/pdf");
+
+          const formData = new FormData();
+          formData.append("pdf", pdfBlob, "invoice.pdf");
+          formData.append("to", emailId); // The recipient's email address
+          formData.append("subject", "Your Invoice is ready!");
+          formData.append("text", "Please find the attached invoice.");
+
+          fetch(`${import.meta.env.VITE_BASE_URL}/billing/sendEmail`, {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+            })
+            .catch((error) => {
+              console.error("Error sending email", error);
+              toast.error("Failed to send invoce to Mail");
+            });
+
+          easyinvoice.download("myInvoice.pdf", result.pdf);
+          setLoader(false);
+          toast.success("Invoice downloaded successfully");
+          clearFields();
+        } else {
+          // Handle error
+          console.error("Failed to create bill");
+          toast.error("Error in Billing");
+          clearFields();
+          setLoader(false);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
+  // Helper function to convert base64 to Blob
+  function b64toBlob(b64Data, contentType = "", sliceSize = 512) {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+    return new Blob(byteArrays, { type: contentType });
+  }
   return (
     <div className="billing_box">
       <Loader />
@@ -274,22 +390,25 @@ const Billing = () => {
                 Product Name
               </div>
               <div className="text__Fld text-center font-semibold text-20">
-                Sub Entity
+                Size
               </div>
               <div className="auto__Fld text-center font-semibold text-20">
                 Product Id
               </div>
               <div className="text__Fld text-center font-semibold text-20">
-                Order Quantity
+                MRP
               </div>
               <div className="text__Fld text-center font-semibold text-20">
-                Price
+                Order Quantity
               </div>
               <div className="sbt__Btn text-center font-semibold text-20">
                 Actions
               </div>
             </div>
-            <form onSubmit={submitBill} className="flex flex-col gap-5">
+            <form
+              onSubmit={(event) => submitBill(event)}
+              className="flex flex-col gap-5"
+            >
               {products.map((product, index) => (
                 <>
                   <div key={index} className="product-details-row">
@@ -312,15 +431,15 @@ const Billing = () => {
                     />
                     <Autocomplete
                       className="auto__Fld"
-                      options={availableSubEntites}
-                      value={product.subEntity}
+                      options={availableSizes}
+                      value={product.size}
                       onChange={(event, newValue) =>
-                        handleProductChange(index, "subEntity", newValue)
+                        handleProductChange(index, "size", newValue)
                       }
                       renderInput={(params) => (
                         <TextField
                           {...params}
-                          placeholder="Select Sub Entity"
+                          placeholder="Select Size"
                           variant="outlined"
                           fullWidth
                           required
@@ -335,9 +454,20 @@ const Billing = () => {
                         handleProductChange(index, "productId", e.target.value)
                       }
                       placeholder="Enter Product Id"
-                      required
                       autoComplete="off"
                       name="productId"
+                      disabled
+                    />
+                    <TextField
+                      className="text__Fld"
+                      status="text"
+                      value={product.price}
+                      onChange={(e) =>
+                        handleProductChange(index, "price", e.target.value)
+                      }
+                      placeholder="Price"
+                      autoComplete="off"
+                      name="price"
                       disabled
                     />
                     <TextField
@@ -350,19 +480,7 @@ const Billing = () => {
                       placeholder="Enter Order Quantity"
                       required
                       autoComplete="off"
-                      name="order_qty"
-                    />
-                    <TextField
-                      className="text__Fld"
-                      status="text"
-                      value={product.price}
-                      onChange={(e) =>
-                        handleProductChange(index, "price", e.target.value)
-                      }
-                      placeholder="Price"
-                      required
-                      autoComplete="off"
-                      name="price"
+                      name="quantity"
                     />
                     <button
                       type="button" // Ensure this button doesn't submit the form
@@ -395,18 +513,18 @@ const Billing = () => {
                       />
                     </div>
                     <div className="deatails__Fld">
-                      <p>Sub Entity</p>
+                      <p>Size</p>
                       <Autocomplete
                         className="auto__Fld"
-                        options={availableSubEntites}
-                        value={product.subEntity}
+                        options={availableSizes}
+                        value={product.size}
                         onChange={(event, newValue) =>
-                          handleProductChange(index, "subEntity", newValue)
+                          handleProductChange(index, "size", newValue)
                         }
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            placeholder="Select Sub Entity"
+                            placeholder="Select Size"
                             variant="outlined"
                             fullWidth
                             required
@@ -428,29 +546,13 @@ const Billing = () => {
                           )
                         }
                         placeholder="Enter Product Id"
-                        required
                         autoComplete="off"
                         name="productId"
                         disabled
                       />
                     </div>
                     <div className="deatails__Fld">
-                      <p>Order Quantity</p>
-                      <TextField
-                        className="text__Fld"
-                        status="text"
-                        value={product.quantity}
-                        onChange={(e) =>
-                          handleProductChange(index, "quantity", e.target.value)
-                        }
-                        placeholder="Enter Order Quantity"
-                        required
-                        autoComplete="off"
-                        name="order_qty"
-                      />
-                    </div>
-                    <div className="deatails__Fld">
-                      <p>Price</p>
+                      <p>MRP</p>
                       <TextField
                         className="text__Fld"
                         status="text"
@@ -459,9 +561,24 @@ const Billing = () => {
                           handleProductChange(index, "price", e.target.value)
                         }
                         placeholder="Price"
-                        required
                         autoComplete="off"
                         name="price"
+                        disabled
+                      />
+                    </div>
+                    <div className="deatails__Fld">
+                      <p>Order Quantity</p>
+                      <TextField
+                        className="text__Fld"
+                        status="integer"
+                        value={product.quantity}
+                        onChange={(e) =>
+                          handleProductChange(index, "quantity", e.target.value)
+                        }
+                        placeholder="Enter Order Quantity"
+                        required
+                        autoComplete="off"
+                        name="quantity"
                       />
                     </div>
                     <div className="deatails__Fld">

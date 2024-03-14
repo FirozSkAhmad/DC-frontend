@@ -150,7 +150,7 @@ const Overview = () => {
 
   function convertOrderDataToCSV(orderData) {
     let csvContent =
-      "Store ID,Store Name,Client Name,Order ID,Product ID,Product Name,Sub Entity,Quantity,Price,Ordered Date,Total Price\n";
+      "Store ID,Store Name,Client Name,Order ID,Product ID,Product Name,Size,Quantity,MRP,Ordered Date,Total Price\n";
 
     orderData.orders.forEach((order) => {
       order.products.forEach((product) => {
@@ -161,9 +161,9 @@ const Overview = () => {
           order.orderId,
           product.product_id,
           product.product_name,
-          product.sub_entity,
+          product.size,
           product.quantity,
-          product.price,
+          product.MRP,
           order.ordered_date,
           order.total_price,
         ];
@@ -289,19 +289,19 @@ const Overview = () => {
                                 <p className="font-bold text-20">Products:</p>
                                 <div className="heading-row">
                                   <div className="text__Fld text-center font-bold text-20">
-                                    Part Number
+                                    Product Id
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
                                     Part Name
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
-                                    Sub Entity
+                                    Size
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
                                     Order Quantity
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
-                                    Price
+                                    MRP
                                   </div>
                                 </div>
                                 {data?.products.map((product, index) => (
@@ -317,13 +317,13 @@ const Overview = () => {
                                         {product.product_name}
                                       </p>
                                       <p className="text__Fld text-center">
-                                        {product.sub_entity}
+                                        {product.size}
                                       </p>
                                       <p className="text__Fld text-center">
                                         {product.quantity}
                                       </p>
                                       <p className="text__Fld text-center">
-                                        ₹{product.price}
+                                        ₹{product.MRP}
                                       </p>
                                     </div>
                                     <div
@@ -331,7 +331,7 @@ const Overview = () => {
                                       className="product-details-col pl-3"
                                     >
                                       <p className="label">
-                                        Part Number :{" "}
+                                        Product Id :{" "}
                                         <span className="value">
                                           {product.product_id}
                                         </span>
@@ -343,9 +343,9 @@ const Overview = () => {
                                         </span>
                                       </p>
                                       <p className="label">
-                                        Sub Entity :{" "}
+                                        Size :{" "}
                                         <span className="value">
-                                          {product.sub_entity}
+                                          {product.size}
                                         </span>
                                       </p>
                                       <p className="label">
@@ -355,9 +355,9 @@ const Overview = () => {
                                         </span>
                                       </p>
                                       <p className="label">
-                                        Price :{" "}
+                                        MRP :{" "}
                                         <span className="value">
-                                          ₹{product.price}
+                                          ₹{product.MRP}
                                         </span>
                                       </p>
                                     </div>
@@ -462,19 +462,19 @@ const Overview = () => {
                                   <p className="font-bold text-20">Products:</p>
                                   <div className="heading-row">
                                     <div className="text__Fld text-center font-bold text-20">
-                                      Part Number
+                                      Product Id
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
                                       Part Name
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
-                                      Sub Entity
+                                      Size
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
                                       Order Quantity
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
-                                      Price
+                                      MRP
                                     </div>
                                   </div>
                                   {data?.products.map((product, index) => (
@@ -490,13 +490,13 @@ const Overview = () => {
                                           {product.product_name}
                                         </p>
                                         <p className="text__Fld text-center">
-                                          {product.sub_entity}
+                                          {product.size}
                                         </p>
                                         <p className="text__Fld text-center">
                                           {product.quantity}
                                         </p>
                                         <p className="text__Fld text-center">
-                                          ₹{product.price}
+                                          ₹{product.MRP}
                                         </p>
                                       </div>
                                       <div
@@ -504,7 +504,7 @@ const Overview = () => {
                                         className="product-details-col pl-3"
                                       >
                                         <p className="label">
-                                          Part Number :{" "}
+                                          Product Id :{" "}
                                           <span className="value">
                                             {product.product_id}
                                           </span>
@@ -516,7 +516,7 @@ const Overview = () => {
                                           </span>
                                         </p>
                                         <p className="label">
-                                          Sub Entity :{" "}
+                                          Size :{" "}
                                           <span className="value">
                                             {product.sub_entity}
                                           </span>
@@ -528,9 +528,9 @@ const Overview = () => {
                                           </span>
                                         </p>
                                         <p className="label">
-                                          Price :{" "}
+                                          MRP :{" "}
                                           <span className="value">
-                                            ₹{product.price}
+                                            ₹{product.MRP}
                                           </span>
                                         </p>
                                       </div>

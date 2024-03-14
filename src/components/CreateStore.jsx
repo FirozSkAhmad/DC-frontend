@@ -78,12 +78,12 @@ const CreateStore = ({ handleClose, getAllStores }) => {
       .then((result) => {
         console.log(result);
         if (result.status == 401) {
-          clearFields();
-          handleClose();
+          // clearFields();
+          // handleClose();
           toast.error(result.message);
         } else if (result.status == 500) {
-          clearFields();
-          handleClose();
+          // clearFields();
+          // handleClose();
           alert(result.message);
         } else if (result.message == "Success") {
           clearFields();

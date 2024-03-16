@@ -23,7 +23,7 @@ const Products = () => {
     {
       field: "productName",
       headerName: "Product Name",
-      width: 150,
+      width: 200,
       editable: false,
       align: "center",
       headerAlign: "center",

@@ -62,7 +62,7 @@
   width: 90%; /* Expanded width when the .open class is present */
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 768px) {
   .heading-row,
   .product-details-row {
     display: none;

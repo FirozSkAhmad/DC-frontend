@@ -6,16 +6,23 @@ import SideNav from "./SideNav";
 import easyinvoice from "easyinvoice";
 import { TextField, Autocomplete } from "@mui/material";
 import toast from "react-hot-toast";
+// import dressCodeLogo from "../../utils/Official_logo_of_the_All_India_Anna_Dravida_Munnetra_Kazhagam-removebg-preview 1.png";
 
 const Billing = () => {
   const { userRole, isSideNavOpen, setLoader, token, emailId } =
     useContext(sharedContext);
 
-  const clientName = sessionStorage.getItem("clientName");
-  const storeName = sessionStorage.getItem("storeName");
+  const executiveName = sessionStorage.getItem("executiveName");
 
   const [availableProductsNms, setAvailableProductsNms] = useState([]);
   const [availableSizes, setAvailableSizes] = useState([]);
+  const [studentDetails, setStudentDetails] = useState({
+    studentName: "",
+    class: "",
+    rollNo: "",
+    emailId: "",
+    phnNo: "",
+  });
 
   const [products, setProducts] = useState([
     {
@@ -29,6 +36,25 @@ const Billing = () => {
   ]);
 
   const [totalPrice, setTotalPrice] = useState(0);
+
+  // State to track whether the screen is below the medium breakpoint
+  const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 768); // Tailwind's 'md' breakpoint is 768px by default
+
+  useEffect(() => {
+    function handleResize() {
+      // Update the state based on window width
+      setIsSmallScreen(window.innerWidth < 768);
+    }
+
+    // Set up the event listener
+    window.addEventListener("resize", handleResize);
+
+    // Call the handler right away so state gets updated with initial window size
+    handleResize();
+
+    // Remove event listener on cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const addProduct = () => {
     setProducts([
@@ -172,6 +198,7 @@ const Billing = () => {
           headers: myHeaders,
           redirect: "follow",
         };
+        setLoader(true);
         const response = await fetch(
           `${import.meta.env.VITE_BASE_URL}/admin/getAllProductNames`,
           requestOptions
@@ -179,8 +206,10 @@ const Billing = () => {
         if (response.ok) {
           const obj = await response.json();
           setAvailableProductsNms(obj.data);
+          setLoader(false);
         } else {
           console.error("Failed to fetch part numbers");
+          setLoader(false);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -201,6 +230,13 @@ const Billing = () => {
         presentQuantity: "",
       },
     ]);
+    setStudentDetails({
+      studentName: "",
+      class: "",
+      rollNo: "",
+      emailId: "",
+      phnNo: "",
+    });
     setTotalPrice(0);
   };
 
@@ -211,8 +247,21 @@ const Billing = () => {
     return `${day}-${month}-${year}`;
   }
 
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setStudentDetails({
+      ...studentDetails,
+      [name]: value,
+    });
+  };
+
   const submitBill = async (event) => {
     event.preventDefault();
+    // Phone validation: must be 10 digits
+    if (!/^\d{10}$/.test(studentDetails.phnNo)) {
+      alert("Please enter a valid 10 digit phone number.");
+      return false;
+    }
     try {
       console.log("clicked submit button");
       setLoader(true);
@@ -256,22 +305,21 @@ const Billing = () => {
         const formattedCurrentDate = formatDate(currentDate);
 
         const data = {
+          images: {
+            // The logo on top of your invoice
+            logo: "https://dresscode-invoices.s3.ap-south-1.amazonaws.com/logos/dressCode_Logo.png",
+          },
           // Your own data
           sender: {
-            company: "DressCode",
-            // address: "Sample Street 123",
-            // zip: "1234 AB",
-            // city: "Sampletown",
-            // country: "Samplecountry",
-          },
-          // Your recipient
-          client: {
+            // company: "DressCode",
             company: "Raj Selections",
             address: "Address:-Opp IB, Zaheerabad,502220.",
             zip: "Email ID:- madhurjhaver@gmail.com",
             city: "9290466004",
             country: "GST No:- 36AESPJ6764L1ZN",
           },
+          // Your recipient
+          client: {},
           information: {
             // Invoice number
             number: "2021.0001",
@@ -289,6 +337,7 @@ const Billing = () => {
             currency: "INR",
           },
         };
+
         const response = await fetch(
           `${import.meta.env.VITE_BASE_URL}/billing/createNewBill`,
           {
@@ -298,8 +347,11 @@ const Billing = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              storeName: storeName,
-              clientName: clientName,
+              studentName: studentDetails.studentName,
+              class: studentDetails.class,
+              rollNo: studentDetails.rollNo,
+              emailId: studentDetails.emailId,
+              phnNo: studentDetails.phnNo,
               products: products,
               orderedDate: formattedCurrentDate,
               totalPrice: totalPrice,
@@ -312,27 +364,73 @@ const Billing = () => {
           const responseBody = await response.json();
           console.log("Bill created successfully");
           data.information.number = "RAJ000" + responseBody.orderId;
+          data.client.company = `Name :-${studentDetails.studentName}`;
+          data.client.address = `Class:-${studentDetails.class}`;
+          data.client.zip = `Roll No:-${
+            studentDetails.rollNo ? studentDetails.rollNo : "---"
+          }`;
+          data.client.city = `Email ID:-${
+            studentDetails.emailId ? studentDetails.emailId : "---"
+          }`;
+          data.client.country = `Mobile No:-${studentDetails.phnNo}`;
           const result = await easyinvoice.createInvoice(data);
           const pdfBlob = b64toBlob(result.pdf, "application/pdf");
 
-          const formData = new FormData();
-          formData.append("pdf", pdfBlob, "invoice.pdf");
-          formData.append("to", emailId); // The recipient's email address
-          formData.append("subject", "Your Invoice is ready!");
-          formData.append("text", "Please find the attached invoice.");
+          const pdfFormData = new FormData();
+          pdfFormData.append("pdf", pdfBlob, "RAJ000" + responseBody.orderId);
 
-          fetch(`${import.meta.env.VITE_BASE_URL}/billing/sendEmail`, {
+          fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
             method: "POST",
-            body: formData,
+            body: pdfFormData,
           })
             .then((response) => response.json())
             .then((data) => {
               console.log(data);
+              var myHeaders = new Headers();
+              myHeaders.append("Authorization", `Bearer ${token}`);
+              myHeaders.append("Content-Type", "application/json");
+
+              var raw = JSON.stringify({
+                phn_no: studentDetails.phnNo,
+                s3Url: data.s3Url,
+              });
+
+              var requestOptions = {
+                method: "POST",
+                headers: myHeaders,
+                body: raw,
+                redirect: "follow",
+              };
+              fetch(
+                `${import.meta.env.VITE_BASE_URL}/whatsapp/sendPDF`,
+                requestOptions
+              );
             })
             .catch((error) => {
               console.error("Error sending email", error);
               toast.error("Failed to send invoce to Mail");
             });
+
+          if (studentDetails.emailId) {
+            const formData = new FormData();
+            formData.append("pdf", pdfBlob, "invoice.pdf");
+            formData.append("to", studentDetails.emailId); // The recipient's email address
+            formData.append("subject", "Your Invoice is ready!");
+            formData.append("text", "Please find the attached invoice.");
+
+            fetch(`${import.meta.env.VITE_BASE_URL}/billing/sendEmail`, {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                console.log(data);
+              })
+              .catch((error) => {
+                console.error("Error sending email", error);
+                toast.error("Failed to send invoce to Mail");
+              });
+          }
 
           easyinvoice.download("myInvoice.pdf", result.pdf);
           setLoader(false);
@@ -367,6 +465,7 @@ const Billing = () => {
     }
     return new Blob(byteArrays, { type: contentType });
   }
+
   return (
     <div className="billing_box">
       <Loader />
@@ -376,39 +475,153 @@ const Billing = () => {
             className="flex flex-col gap-10 bg-white p-5 overflow-x-auto custom-scrollbar"
             style={{ borderRadius: "4px" }}
           >
-            <div className="flex justify-between">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-20">Name:</p>
-                <p>{clientName}</p>
-              </div>
-              <div className="add__Btn" onClick={addProduct}>
-                <button>Add Product</button>
+            <div className={`flex justify-between`}>
+              <div className={`flex items-center gap-2}`}>
+                <p className="font-semibold text-20 mr-2">Executive Name:</p>
+                <p>{executiveName}</p>
               </div>
             </div>
-            <div className="heading-row">
-              <div className="text__Fld text-center font-semibold text-20">
-                Product Name
-              </div>
-              <div className="text__Fld text-center font-semibold text-20">
-                Size
-              </div>
-              <div className="auto__Fld text-center font-semibold text-20">
-                Product Id
-              </div>
-              <div className="text__Fld text-center font-semibold text-20">
-                MRP
-              </div>
-              <div className="text__Fld text-center font-semibold text-20">
-                Order Quantity
-              </div>
-              <div className="sbt__Btn text-center font-semibold text-20">
-                Actions
-              </div>
-            </div>
+
             <form
               onSubmit={(event) => submitBill(event)}
               className="flex flex-col gap-5"
             >
+              <div className="flex flex-col gap-2">
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="student_name"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "9vw" }}
+                  >
+                    Student name * :
+                  </label>
+                  <input
+                    type="text"
+                    id="student_name"
+                    name="studentName"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400"
+                    placeholder="Entire Student Name"
+                    value={studentDetails.studentName}
+                    onChange={onChangeInput}
+                    required
+                  />
+                </div>
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="class"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "9vw" }}
+                  >
+                    Class * :
+                  </label>
+                  <input
+                    type="text"
+                    id="class"
+                    name="class"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400"
+                    placeholder="Entire Class"
+                    value={studentDetails.class}
+                    onChange={onChangeInput}
+                    required
+                  />
+                </div>
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="roll_no"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "9vw" }}
+                  >
+                    Roll No :
+                  </label>
+                  <input
+                    type="text"
+                    id="roll_no"
+                    name="rollNo"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400"
+                    placeholder="Entire Roll No"
+                    onChange={onChangeInput}
+                    value={studentDetails.rollNo}
+                  />
+                </div>
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="eamil_id"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "9vw" }}
+                  >
+                    Eamil Id :
+                  </label>
+                  <input
+                    type="email"
+                    id="eamil_id"
+                    name="emailId"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400"
+                    placeholder="Entire Email Id"
+                    onChange={onChangeInput}
+                    value={studentDetails.emailId}
+                  />
+                </div>
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="phn_no"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "9vw" }}
+                  >
+                    Mobile No * :
+                  </label>
+                  <input
+                    type="text"
+                    id="phn_no"
+                    name="phnNo"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:placeholder-gray-400"
+                    placeholder="Entire WhatsApp Number"
+                    value={studentDetails.phnNo}
+                    onChange={onChangeInput}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="heading-row">
+                <div className="text__Fld text-center font-semibold text-20">
+                  Product Name
+                </div>
+                <div className="text__Fld text-center font-semibold text-20">
+                  Size
+                </div>
+                <div className="auto__Fld text-center font-semibold text-20">
+                  Product Id
+                </div>
+                <div className="text__Fld text-center font-semibold text-20">
+                  MRP
+                </div>
+                <div className="text__Fld text-center font-semibold text-20">
+                  Order Quantity
+                </div>
+                <div className="sbt__Btn text-center font-semibold text-20">
+                  Actions
+                </div>
+              </div>
               {products.map((product, index) => (
                 <>
                   <div key={index} className="product-details-row">
@@ -595,7 +808,11 @@ const Billing = () => {
                   </div>
                 </>
               ))}
-
+              <div className={`flex justify-between flex-row-reverse`}>
+                <div className="add__Btn" onClick={addProduct}>
+                  <button type="button">Add Products</button>
+                </div>
+              </div>
               <div className="total-price flex gap-1">
                 <p className="font-semibold text-20">Total Price :</p>
                 <p>{totalPrice}</p>

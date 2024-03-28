@@ -102,7 +102,7 @@ const SideNav = () => {
             </NavLink>
           </div>
         )}
-        {userRole === "CLIENT" && (
+        {userRole === "EXECUTIVE" && (
           <div className="categories_con">
             <NavLink
               style={{

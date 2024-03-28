@@ -33,7 +33,7 @@ const Stores = () => {
       redirect: "follow",
     };
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/admin/getAllStores`, requestOptions)
+    fetch(`${import.meta.env.VITE_BASE_URL}/admin/getAllExecutives`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result.data);
@@ -129,12 +129,12 @@ const Stores = () => {
           style={{ width: "max-content" }}
           name="upload"
         >
-          <h4>Create Store</h4>
+          <h4>Create Executive</h4>
         </button>
       </div>
       <div className="storesData_box">
         <div className="heading_con">
-          <h2 className="font-medium text-xl">Stores</h2>
+          <h2 className="font-medium text-xl">Executives</h2>
         </div>
         <div className="stores_box">
           <div className="stores_con">
@@ -146,8 +146,8 @@ const Stores = () => {
                       className="flex gap-1 cursor-pointer noWhiteSpace"
                       onClick={() => handleClientClick(index)}
                     >
-                      <p className="font-bold text-20">Store Name :</p>
-                      <p className="noWhiteSpace">{storeData?.storeName}</p>
+                      <p className="font-bold text-20">Executive Name :</p>
+                      <p className="noWhiteSpace">{storeData?.executiveName}</p>
                     </div>
                     {selectedClient === index && (
                       <img
@@ -161,8 +161,8 @@ const Stores = () => {
                   {selectedClient === index && (
                     <div key={index} className="p-5">
                       <div className="flex items-center gap-1 mb-5">
-                        <p className="font-bold text-20">Client Name :</p>
-                        <p>{storeData?.clientName}</p>
+                        <p className="font-bold text-20">Executive Name :</p>
+                        <p>{storeData?.executiveName}</p>
                       </div>
                       <div className="flex items-center gap-1 mb-5">
                         <p className="font-bold text-20">Email Id :</p>
@@ -181,7 +181,7 @@ const Stores = () => {
                       </div>
                       <button
                         className="bg-red-500 text-white px-2 py-1 rounded-md"
-                        onClick={() => handleDeleteClick(storeData?.storeId)}
+                        onClick={() => handleDeleteClick(storeData?.executiveId)}
                       >
                         Delete
                       </button>

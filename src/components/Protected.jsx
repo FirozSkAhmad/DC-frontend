@@ -9,7 +9,7 @@ const Protected = ({ cmp }) => {
   useEffect(() => {
     if (sessionStorage.getItem("userRole") === "SUPER ADMIN") {
       navigate("/overview");
-    } else if (sessionStorage.getItem("userRole") === "CLIENT") {
+    } else if (sessionStorage.getItem("userRole") === "EXECUTIVE") {
       navigate("/uploadSales");
     } else {
       navigate("/login");

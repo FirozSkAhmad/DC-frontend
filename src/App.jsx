@@ -63,7 +63,7 @@ const appRouter = createBrowserRouter([
         element: (
           <Protected
             cmp={<UploadSales />}
-            allowedRoles={["SUPER ADMIN", "CLIENT"]}
+            allowedRoles={["SUPER ADMIN", "EXECUTIVE"]}
           />
         ),
         path: "/uploadSales",
@@ -72,7 +72,7 @@ const appRouter = createBrowserRouter([
         element: (
           <Protected
             cmp={<Billing />}
-            allowedRoles={["SUPER ADMIN", "CLIENT"]}
+            allowedRoles={["SUPER ADMIN", "EXECUTIVE"]}
           />
         ),
         path: "/billing",

@@ -6,6 +6,7 @@ import uploadIcon from "../../utils/uploadIcon.svg";
 import Loader from "./Loader";
 import SideNav from "./SideNav";
 import closeIcon from "../../utils/closeIcon.svg";
+import toast from "react-hot-toast";
 
 const Overview = () => {
   const { setLoader, token, isSideNavOpen } = useContext(sharedContext);
@@ -76,14 +77,14 @@ const Overview = () => {
       });
 
     fetch(
-      `${import.meta.env.VITE_BASE_URL}/orders/getAllOfflineStores`,
+      `${import.meta.env.VITE_BASE_URL}/orders/getAllOfflineExecutives`,
       requestOptions
     )
       .then((response) => response.json())
       .then((result) => {
         console.log(result.data);
         if (result.status == 200) {
-          setOfflineOrdersData(result.data.stores);
+          setOfflineOrdersData(result.data.executives);
         }
         setLoader(false);
       })
@@ -150,14 +151,18 @@ const Overview = () => {
 
   function convertOrderDataToCSV(orderData) {
     let csvContent =
-      "Store ID,Store Name,Client Name,Order ID,Product ID,Product Name,Size,Quantity,MRP,Ordered Date,Total Price\n";
+      "Executive ID,Executive Name,Student Name,Class,Roll No,Email Id,Phone No,Order ID,Product ID,Product Name,Size,Quantity,MRP,Ordered Date,Total Price\n";
 
     orderData.orders.forEach((order) => {
       order.products.forEach((product) => {
         const row = [
-          orderData.store_id,
-          orderData.store_name,
-          orderData.client_name,
+          orderData.executive_id,
+          orderData.executive_name,
+          order.studentName,
+          order.class,
+          order.roll_no,
+          order.email_id,
+          order.phn_no,
           order.orderId,
           product.product_id,
           product.product_name,
@@ -181,7 +186,7 @@ const Overview = () => {
 
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `${orderData.store_name}_orders.csv`);
+    link.setAttribute("download", `${orderData.executive_name}_orders.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -236,7 +241,8 @@ const Overview = () => {
             <div className="upload_con">
               <button
                 className="upload_button"
-                onClick={(event) => toggleDrawer(event, true, "upload")}
+                // onClick={(event) => toggleDrawer(event, true, "upload")}
+                onClick={() => toast.error("Coming Soon!")}
                 style={{ width: "max-content" }}
                 name="upload"
               >
@@ -292,7 +298,7 @@ const Overview = () => {
                                     Product Id
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
-                                    Part Name
+                                    Product Name
                                   </div>
                                   <div className="text__Fld text-center font-bold text-20">
                                     Size
@@ -337,7 +343,7 @@ const Overview = () => {
                                         </span>
                                       </p>
                                       <p className="label">
-                                        Part Name :{" "}
+                                        Product Name :{" "}
                                         <span className="value">
                                           {product.product_name}
                                         </span>
@@ -410,25 +416,19 @@ const Overview = () => {
                         <div key={index} className="client_box">
                           <div className="client_con">
                             <div
-                              className="flex flex-col gap-1 cursor-pointer noWhiteSpace"
+                              className="flex flex-col gap-1 cursor-pointer " //noWhiteSpace
                               onClick={() =>
                                 handleClientClick(index, orderData)
                               }
                             >
                               <div className="flex gap-1">
                                 <p className="font-bold text-20">
-                                  Store Name :
+                                  Executive Name :
                                 </p>
-                                <p className="noWhiteSpace">
-                                  {orderData?.store_name}
-                                </p>
-                              </div>
-                              <div className="flex gap-1">
-                                <p className="font-bold text-20">
-                                  Client Name :
-                                </p>
-                                <p className="noWhiteSpace">
-                                  {orderData?.client_name}
+                                <p>
+                                  {" "}
+                                  {/* className="noWhiteSpace" */}
+                                  {orderData?.executive_name}
                                 </p>
                               </div>
                             </div>
@@ -451,21 +451,98 @@ const Overview = () => {
                           </div>
                           {selectedClient === index &&
                             orderData?.orders?.map((data, index) => (
-                              <div key={index} className="p-3">
+                              <div
+                                key={index}
+                                className="mt-2 p-2 rounded-md bg-gray-100"
+                              >
                                 <div className="flex gap-1">
                                   <p className="font-bold text-20 mb-5">
                                     Order Id :
                                   </p>
                                   <p>{data?.orderId}</p>
                                 </div>
-                                <div className="flex flex-col gap-5">
+                                <div className="flex flex-col gap-5 pl-2 mb-5">
+                                  <p className="font-bold text-20">
+                                    Student Details:
+                                  </p>
+                                  <div className="heading-row">
+                                    <div className="text__Fld text-center font-bold text-20">
+                                      Student Name
+                                    </div>
+                                    <div className="text__Fld text-center font-bold text-20">
+                                      Class
+                                    </div>
+                                    <div className="text__Fld text-center font-bold text-20">
+                                      Roll No
+                                    </div>
+                                    <div className="text__Fld text-center font-bold text-20">
+                                      Email ID
+                                    </div>
+                                    <div className="text__Fld text-center font-bold text-20">
+                                      Mobile No
+                                    </div>
+                                  </div>
+                                  <div className="product-details-row">
+                                    <p className="text__Fld text-center">
+                                      {data?.studentName}
+                                    </p>
+                                    <p className="text__Fld text-center">
+                                      {data?.class}
+                                    </p>
+                                    <p className="text__Fld text-center">
+                                      {data?.roll_no||"---"}
+                                    </p>
+                                    <p className="text__Fld text-center">
+                                      {data?.email_id||"---"}
+                                    </p>
+                                    <p className="text__Fld text-center">
+                                      {data?.phn_no}
+                                    </p>
+                                  </div>
+                                  <div
+                                    key={index}
+                                    className="product-details-col pl-2"
+                                  >
+                                    <p className="label">
+                                      Student Name :{" "}
+                                      <span className="value">
+                                        {data?.studentName}
+                                      </span>
+                                    </p>
+                                    <p className="label">
+                                      Class :{" "}
+                                      <span className="value">
+                                        {data?.class}
+                                      </span>
+                                    </p>
+                                    <p className="label">
+                                      Roll No :{" "}
+                                      <span className="value">
+                                        {data?.roll_no||"---"}
+                                      </span>
+                                    </p>
+                                    <p className="label">
+                                      Email ID :{" "}
+                                      <span className="value">
+                                        {data?.email_id||"---"}
+                                      </span>
+                                    </p>
+                                    <p className="label">
+                                      Mobile No :{" "}
+                                      <span className="value">
+                                        {data?.phn_no}
+                                      </span>
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex flex-col gap-5 pl-2">
                                   <p className="font-bold text-20">Products:</p>
                                   <div className="heading-row">
                                     <div className="text__Fld text-center font-bold text-20">
                                       Product Id
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
-                                      Part Name
+                                      Product Name
                                     </div>
                                     <div className="text__Fld text-center font-bold text-20">
                                       Size
@@ -501,7 +578,7 @@ const Overview = () => {
                                       </div>
                                       <div
                                         key={index}
-                                        className="product-details-col pl-3"
+                                        className="product-details-col pl-2"
                                       >
                                         <p className="label">
                                           Product Id :{" "}
@@ -510,7 +587,7 @@ const Overview = () => {
                                           </span>
                                         </p>
                                         <p className="label">
-                                          Part Name :{" "}
+                                          Product Name :{" "}
                                           <span className="value">
                                             {product.product_name}
                                           </span>
@@ -518,7 +595,7 @@ const Overview = () => {
                                         <p className="label">
                                           Size :{" "}
                                           <span className="value">
-                                            {product.sub_entity}
+                                            {product.size}
                                           </span>
                                         </p>
                                         <p className="label">
@@ -539,7 +616,8 @@ const Overview = () => {
                                   <div className="footer-container">
                                     <div className="flex flex-col gap-1">
                                       <div className="flex gap-1">
-                                        <p className="font-bold text-20 noWhiteSpace">
+                                        <p className="font-bold text-20 ">
+                                          {/*noWhiteSpace*/}
                                           Ordered At :
                                         </p>
                                         <p className="noWhiteSpace">
@@ -548,11 +626,12 @@ const Overview = () => {
                                       </div>
                                     </div>
                                     <div className="flex gap-1">
-                                      <p className="font-bold text-20 noWhiteSpace">
+                                      <p className="font-bold text-20">
+                                        {/*noWhiteSpace*/}
                                         Total Price :
                                       </p>
-                                      <p className="noWhiteSpace">
-                                        ₹{data?.total_price}
+                                      <p className="">
+                                        {/*noWhiteSpace*/}₹{data?.total_price}
                                       </p>
                                     </div>
                                   </div>

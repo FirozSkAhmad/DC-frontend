@@ -4,6 +4,7 @@ import Drawer from "./Drawer";
 import sharedContext from "../context/SharedContext";
 import uploadIcon from "../../utils/uploadIcon.svg";
 import SideNav from "./SideNav";
+import toast from "react-hot-toast";
 
 const UploadSales = () => {
   const { isSideNavOpen } = useContext(sharedContext);
@@ -35,7 +36,8 @@ const UploadSales = () => {
       <div className="upload_con">
         <button
           className="upload_button"
-          onClick={(event) => toggleDrawer(event, true, "upload")}
+          // onClick={(event) => toggleDrawer(event, true, "upload")}
+          onClick={() => toast.error("Coming Soon!")}
           style={{ width: "max-content" }}
           name="upload"
         >

@@ -11,11 +11,10 @@ const CreateStore = ({ handleClose, getAllStores }) => {
   const { setLoader, token } = useContext(sharedContext);
   const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
-    storeName: "",
+    executiveName: "",
     emailId: "",
     password: "",
-    clientName: "",
-    roleType: "CLIENT",
+    roleType: "EXECUTIVE",
   });
 
   const onChangeInput = (e) => {
@@ -24,33 +23,22 @@ const CreateStore = ({ handleClose, getAllStores }) => {
       ...formData,
       [name]: value,
     });
-    if (
-      formData.storeName &&
-      formData.emailId &&
-      formData.password &&
-      formData.clientName
-    ) {
+    if (formData.executiveName && formData.emailId && formData.password) {
       setMessage("");
     }
   };
 
   const clearFields = () => {
     setFormData({
-      storeName: "",
+      executiveName: "",
       emailId: "",
       password: "",
-      clientName: "",
-      roleType: "CLIENT",
+      roleType: "EXECUTIVE",
     });
   };
 
   const validateForm = () => {
-    return (
-      formData.storeName &&
-      formData.emailId &&
-      formData.password &&
-      formData.clientName
-    );
+    return formData.executiveName && formData.emailId && formData.password;
   };
 
   const handleSubmit = (e) => {
@@ -73,7 +61,10 @@ const CreateStore = ({ handleClose, getAllStores }) => {
       redirect: "follow",
     };
 
-    fetch(`${import.meta.env.VITE_BASE_URL}/admin/createStore`, requestOptions)
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/admin/createExecutive`,
+      requestOptions
+    )
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
@@ -89,7 +80,7 @@ const CreateStore = ({ handleClose, getAllStores }) => {
           clearFields();
           handleClose();
           getAllStores();
-          toast.success("Created Store Successfully");
+          toast.success("Created Executive Successfully");
         }
         setLoader(false);
       })
@@ -103,33 +94,20 @@ const CreateStore = ({ handleClose, getAllStores }) => {
     <div className="card">
       <Loader />
       <div className="card_name">
-        <h2 className="font-bold text-20">Create Store</h2>
+        <h2 className="font-bold text-20">Create Executive</h2>
       </div>
       <div className="actions_con">
         <div className="deatails__Fld">
-          <p>Store Name*</p>
+          <p>Executive Name*</p>
           <TextField
             className="text__Fld"
             status="text"
-            value={formData.storeName}
+            value={formData.executiveName}
             onChange={onChangeInput}
-            placeholder="Enter Store Name"
+            placeholder="Enter Executive Name"
             required
             autoComplete="off"
-            name="storeName"
-          />
-        </div>
-        <div className="deatails__Fld">
-          <p>Client Name*</p>
-          <TextField
-            className="text__Fld"
-            status="text"
-            value={formData.clientName}
-            onChange={onChangeInput}
-            placeholder="Enter Client Name"
-            required
-            autoComplete="off"
-            name="clientName"
+            name="executiveName"
           />
         </div>
         <div className="deatails__Fld">
@@ -152,7 +130,7 @@ const CreateStore = ({ handleClose, getAllStores }) => {
             status="text"
             value={formData.password}
             onChange={onChangeInput}
-            placeholder="Enter Store Name"
+            placeholder="Enter Password"
             required
             autoComplete="off"
             name="password"

@@ -37,7 +37,6 @@ const Login = () => {
   };
 
   const handleSubmit = (e) => {
-    console.log("clicked handle submit");
     e.preventDefault();
     setLoader(true);
     if (!formData.emailId || !formData.password || !formData.login_type) {
@@ -70,9 +69,8 @@ const Login = () => {
           setEmailId(result.data.email);
           sessionStorage.setItem("token", result.data.accessToken);
           sessionStorage.setItem("userRole", result.data.role_type);
-          if (result.data.role_type === "CLIENT") {
-            sessionStorage.setItem("clientName", result.data.clientName);
-            sessionStorage.setItem("storeName", result.data.storeName);
+          if (result.data.role_type === "EXECUTIVE") {
+            sessionStorage.setItem("executiveName", result.data.executiveName);
           }
           toast.success("logined Successfully");
           navigate("/overview");
@@ -131,7 +129,7 @@ const Login = () => {
             >
               <option value="">Select Role</option>
               <option value="ADMIN">ADMIN</option>
-              <option value="CLIENT">CLIENT</option>
+              <option value="EXECUTIVE">EXECUTIVE</option>
             </select>
           </div>
           <div>{/* <span style={{ color: "red" }}>{error}</span> */}</div>

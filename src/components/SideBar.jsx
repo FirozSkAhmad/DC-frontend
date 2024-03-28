@@ -79,12 +79,12 @@ const SideBar = () => {
             >
               <div className="category">
                 <img src={stores} alt="caseStudies SVG" />
-                <h3>Stores</h3>
+                <h3>Executives</h3>
               </div>
             </NavLink>
           </div>
         )}
-        {userRole === "CLIENT" && (
+        {userRole === "EXECUTIVE" && (
           <div className="categories_con">
             <NavLink
               style={{

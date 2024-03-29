@@ -306,7 +306,7 @@ const Billing = () => {
             quantity: parseInt(product.quantity) || 0, // Assuming quantity is a string representing an integer
             description: `${product.productName || "Product"},  Size: ${
               product.size || "N/A"
-            }`, // Assuming a default description if none is provided
+            }`,
             // "tax-rate": 6, // Assuming a fixed tax rate of 6%
             price: parseFloat(product.price) || 0.0, // Assuming price is a string representing a float
           };

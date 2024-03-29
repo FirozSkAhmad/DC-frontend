@@ -416,11 +416,16 @@ const Billing = () => {
               fetch(
                 `${import.meta.env.VITE_BASE_URL}/whatsapp/sendPDF`,
                 requestOptions
-              );
+              )
+                .then((response) => response.json())
+                .then((data) => toast.success("Invoice sent successfully via WhatsApp!"))
+                .catch((error) => {
+                  console.error("Error sending whatsapp message", error);
+                });
             })
             .catch((error) => {
-              console.error("Error sending email", error);
-              toast.error("Failed to send invoce to Mail");
+              console.error("Error in uploadToS3", error);
+              // toast.error("Failed to upload invoce to S3");
             });
 
           if (studentDetails.emailId) {
@@ -436,11 +441,11 @@ const Billing = () => {
             })
               .then((response) => response.json())
               .then((data) => {
-                console.log(data);
+                toast.success("Invoice sent successfully via Email!");
               })
               .catch((error) => {
                 console.error("Error sending email", error);
-                toast.error("Failed to send invoce to Mail");
+                // toast.error("Failed to send invoce to Mail");
               });
           }
 

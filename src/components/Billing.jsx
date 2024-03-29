@@ -22,7 +22,11 @@ const Billing = () => {
     rollNo: "",
     emailId: "",
     phnNo: "",
+    mode_of_payment: "",
   });
+  const [selectedPayment, setSelectedPayment] = useState(
+    studentDetails.mode_of_payment || ""
+  );
 
   const [products, setProducts] = useState([
     {
@@ -236,7 +240,9 @@ const Billing = () => {
       rollNo: "",
       emailId: "",
       phnNo: "",
+      mode_of_payment: "",
     });
+    setSelectedPayment("");
     setTotalPrice(0);
   };
 
@@ -249,6 +255,9 @@ const Billing = () => {
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
+    if (name === "mode_of_payment") {
+      setSelectedPayment(value);
+    }
     setStudentDetails({
       ...studentDetails,
       [name]: value,
@@ -295,7 +304,9 @@ const Billing = () => {
         const convertedProducts = products.map((product) => {
           return {
             quantity: parseInt(product.quantity) || 0, // Assuming quantity is a string representing an integer
-            description: product.productName || "Product", // Assuming a default description if none is provided
+            description: `${product.productName || "Product"},  Size: ${
+              product.size || "N/A"
+            }`, // Assuming a default description if none is provided
             // "tax-rate": 6, // Assuming a fixed tax rate of 6%
             price: parseFloat(product.price) || 0.0, // Assuming price is a string representing a float
           };
@@ -314,8 +325,8 @@ const Billing = () => {
             // company: "DressCode",
             company: "Raj Selections",
             address: "Address:-Opp IB, Zaheerabad,502220.",
-            zip: "Email ID:- madhurjhaver@gmail.com",
-            city: "9290466004",
+            zip: "Email ID:- info@dress-code.in",
+            city: "7447444481",
             country: "GST No:- 36AESPJ6764L1ZN",
           },
           // Your recipient
@@ -331,7 +342,7 @@ const Billing = () => {
           // Total values are being calculated automatically
           products: convertedProducts,
           // The message you would like to display on the bottom of your invoice
-          "bottom-notice": "Kindly pay your invoice within 15 days.",
+          "bottom-notice": "Visit us at dress-code.in",
           // Settings to customize your invoice
           settings: {
             currency: "INR",
@@ -352,6 +363,7 @@ const Billing = () => {
               rollNo: studentDetails.rollNo,
               emailId: studentDetails.emailId,
               phnNo: studentDetails.phnNo,
+              modeOfPayment: studentDetails.mode_of_payment,
               products: products,
               orderedDate: formattedCurrentDate,
               totalPrice: totalPrice,
@@ -495,7 +507,7 @@ const Billing = () => {
                   <label
                     htmlFor="student_name"
                     className=" font-semibold text-20 mr-2"
-                    style={{ width: "9vw" }}
+                    style={{ width: "11vw" }}
                   >
                     Student name * :
                   </label>
@@ -518,7 +530,7 @@ const Billing = () => {
                   <label
                     htmlFor="class"
                     className=" font-semibold text-20 mr-2"
-                    style={{ width: "9vw" }}
+                    style={{ width: "11vw" }}
                   >
                     Class * :
                   </label>
@@ -541,7 +553,7 @@ const Billing = () => {
                   <label
                     htmlFor="roll_no"
                     className=" font-semibold text-20 mr-2"
-                    style={{ width: "9vw" }}
+                    style={{ width: "11vw" }}
                   >
                     Roll No :
                   </label>
@@ -563,7 +575,7 @@ const Billing = () => {
                   <label
                     htmlFor="eamil_id"
                     className=" font-semibold text-20 mr-2"
-                    style={{ width: "9vw" }}
+                    style={{ width: "11vw" }}
                   >
                     Eamil Id :
                   </label>
@@ -585,7 +597,7 @@ const Billing = () => {
                   <label
                     htmlFor="phn_no"
                     className=" font-semibold text-20 mr-2"
-                    style={{ width: "9vw" }}
+                    style={{ width: "11vw" }}
                   >
                     Mobile No * :
                   </label>
@@ -599,6 +611,35 @@ const Billing = () => {
                     onChange={onChangeInput}
                     required
                   />
+                </div>
+                <div
+                  className={`flex  ${
+                    isSmallScreen ? "flex-col" : "items-center"
+                  }`}
+                >
+                  <label
+                    htmlFor="phn_no"
+                    className=" font-semibold text-20 mr-2"
+                    style={{ width: "11vw" }}
+                  >
+                    Mode of payment * :
+                  </label>
+                  <select
+                    name="mode_of_payment"
+                    id="mode_of_payment"
+                    className={`bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 ${
+                      !selectedPayment
+                        ? "text-gray-400"
+                        : "dark:placeholder-gray-400"
+                    }`}
+                    value={selectedPayment}
+                    onChange={onChangeInput}
+                    required
+                  >
+                    <option value="">Select Mode of Payment</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Gpay">Gpay</option>
+                  </select>
                 </div>
               </div>
 

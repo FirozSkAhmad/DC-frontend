@@ -151,7 +151,7 @@ const Overview = () => {
 
   function convertOrderDataToCSV(orderData) {
     let csvContent =
-      "Executive ID,Executive Name,Student Name,Class,Roll No,Email Id,Phone No,Order ID,Product ID,Product Name,Size,Quantity,MRP,Ordered Date,Total Price\n";
+      "Executive ID,Executive Name,Student Name,Class,Roll No,Email Id,Phone No,Order ID,Product ID,Product Name,Size,Quantity,MRP,Ordered Date,Total Price,Mode Of Payment\n";
 
     orderData.orders.forEach((order) => {
       order.products.forEach((product) => {
@@ -171,6 +171,7 @@ const Overview = () => {
           product.MRP,
           order.ordered_date,
           order.total_price,
+          order.mode_of_payment,
         ];
         csvContent += row.join(",") + "\n";
       });
@@ -490,10 +491,10 @@ const Overview = () => {
                                       {data?.class}
                                     </p>
                                     <p className="text__Fld text-center">
-                                      {data?.roll_no||"---"}
+                                      {data?.roll_no || "---"}
                                     </p>
                                     <p className="text__Fld text-center">
-                                      {data?.email_id||"---"}
+                                      {data?.email_id || "---"}
                                     </p>
                                     <p className="text__Fld text-center">
                                       {data?.phn_no}
@@ -518,13 +519,13 @@ const Overview = () => {
                                     <p className="label">
                                       Roll No :{" "}
                                       <span className="value">
-                                        {data?.roll_no||"---"}
+                                        {data?.roll_no || "---"}
                                       </span>
                                     </p>
                                     <p className="label">
                                       Email ID :{" "}
                                       <span className="value">
-                                        {data?.email_id||"---"}
+                                        {data?.email_id || "---"}
                                       </span>
                                     </p>
                                     <p className="label">
@@ -613,6 +614,14 @@ const Overview = () => {
                                       </div>
                                     </>
                                   ))}
+                                  <div className="flex gap-1">
+                                    <p className="font-bold text-20">
+                                      Mode Of Payment :
+                                    </p>
+                                    <p className="noWhiteSpace">
+                                      {data?.mode_of_payment}
+                                    </p>
+                                  </div>
                                   <div className="footer-container">
                                     <div className="flex flex-col gap-1">
                                       <div className="flex gap-1">

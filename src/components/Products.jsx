@@ -116,8 +116,8 @@ const Products = () => {
         <div className="upload_con">
           <button
             className="upload_button"
-            // onClick={(event) => toggleDrawer(event, true, "uploadProducts")}
-            onClick={() => toast.error("Coming Soon!")}
+            onClick={(event) => toggleDrawer(event, true, "uploadProducts")}
+            // onClick={() => toast.error("Coming Soon!")}
             style={{ width: "max-content" }}
             name="upload"
           >

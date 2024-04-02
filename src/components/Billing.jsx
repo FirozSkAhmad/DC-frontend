@@ -418,7 +418,9 @@ const Billing = () => {
                 requestOptions
               )
                 .then((response) => response.json())
-                .then((data) => toast.success("Invoice sent successfully via WhatsApp!"))
+                .then((data) =>
+                  toast.success("Invoice sent successfully via WhatsApp!")
+                )
                 .catch((error) => {
                   console.error("Error sending whatsapp message", error);
                 });

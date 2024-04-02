@@ -8,6 +8,7 @@ import Loader from "./Loader";
 import uploadIcon from "../../utils/uploadIcon.svg";
 import SideNav from "./SideNav";
 import toast from "react-hot-toast";
+import { MdOutlineAddchart } from "react-icons/md"
 
 const Products = () => {
   const { setLoader, token, isSideNavOpen } = useContext(sharedContext);
@@ -116,8 +117,18 @@ const Products = () => {
         <div className="upload_con">
           <button
             className="upload_button"
-            // onClick={(event) => toggleDrawer(event, true, "uploadProducts")}
-            onClick={() => toast.error("Coming Soon!")}
+            onClick={(event) => toggleDrawer(event, true, "addQuantity")}
+            // onClick={() => toast.error("Coming Soon!")}
+            style={{ width: "max-content" }}
+            name="upload"
+          >
+            <MdOutlineAddchart />
+            <h4>Add Quantity</h4>
+          </button>
+          <button
+            className="upload_button"
+            onClick={(event) => toggleDrawer(event, true, "uploadProducts")}
+            // onClick={() => toast.error("Coming Soon!")}
             style={{ width: "max-content" }}
             name="upload"
           >

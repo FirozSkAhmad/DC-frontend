@@ -52,6 +52,14 @@ const Drawer = ({
             type="products"
           />
         );
+        case "addQuantity":
+        return (
+          <UploadData
+            handleClose={handleClose}
+            getProducts={getProducts}
+            type="addQuantity"
+          />
+        );
       case "createStore":
         return (
           <CreateStore handleClose={handleClose} getAllStores={getAllStores} />

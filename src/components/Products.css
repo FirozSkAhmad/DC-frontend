@@ -10,6 +10,7 @@
   padding-top: 10px;
   padding-bottom: 10px;
   height: 10%;
+  gap:1vw
 }
 .upload_button {
   background-color: white;

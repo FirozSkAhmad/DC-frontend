@@ -399,14 +399,14 @@ const Billing = () => {
           );
           whatsappFormData.append("messaging_product", "whatsapp");
 
-          // const uploadResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
-          //   method: "POST",
-          //   body: pdfFormData,
-          // });
+          const uploadResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
+            method: "POST",
+            body: pdfFormData,
+          });
 
-          // if (!uploadResponse.ok) {
-          //   throw new Error(`HTTP error during upload to S3! Status: ${uploadResponse.status}`);
-          // }
+          if (!uploadResponse.ok) {
+            throw new Error(`HTTP error during upload to S3! Status: ${uploadResponse.status}`);
+          }
 
           // const uploadData = await uploadResponse.json();
           // console.log('Upload to S3 successful', uploadData);

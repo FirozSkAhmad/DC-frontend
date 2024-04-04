@@ -391,44 +391,95 @@ const Billing = () => {
           const pdfFormData = new FormData();
           pdfFormData.append("pdf", pdfBlob, "RAJ000" + responseBody.orderId);
 
-          fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
-            method: "POST",
-            body: pdfFormData,
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data);
-              var myHeaders = new Headers();
-              myHeaders.append("Authorization", `Bearer ${token}`);
-              myHeaders.append("Content-Type", "application/json");
+          const whatsappFormData = new FormData();
+          whatsappFormData.append(
+            "file",
+            pdfBlob,
+            "RAJ000" + responseBody.orderId + ".pdf"
+          );
+          whatsappFormData.append("messaging_product", "whatsapp");
 
-              var raw = JSON.stringify({
-                phn_no: studentDetails.phnNo,
-                s3Url: data.s3Url,
-              });
+          // const uploadResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
+          //   method: "POST",
+          //   body: pdfFormData,
+          // });
 
-              var requestOptions = {
-                method: "POST",
-                headers: myHeaders,
-                body: raw,
-                redirect: "follow",
-              };
-              fetch(
-                `${import.meta.env.VITE_BASE_URL}/whatsapp/sendPDF`,
-                requestOptions
-              )
-                .then((response) => response.json())
-                .then((data) =>
-                  toast.success("Invoice sent successfully via WhatsApp!")
-                )
-                .catch((error) => {
-                  console.error("Error sending whatsapp message", error);
-                });
-            })
-            .catch((error) => {
-              console.error("Error in uploadToS3", error);
-              // toast.error("Failed to upload invoce to S3");
-            });
+          // if (!uploadResponse.ok) {
+          //   throw new Error(`HTTP error during upload to S3! Status: ${uploadResponse.status}`);
+          // }
+
+          // const uploadData = await uploadResponse.json();
+          // console.log('Upload to S3 successful', uploadData);
+
+          // Post to Facebook Graph API
+          const fbResponse = await fetch(
+            `https://graph.facebook.com/v13.0/${
+              import.meta.env.VITE_WHATSAPP_ID
+            }/media`,
+            {
+              method: "POST",
+              body: whatsappFormData,
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_WHATSAPP_TOKEN}`,
+              },
+            }
+          );
+
+          if (!fbResponse.ok) {
+            throw new Error(
+              `HTTP error during Facebook Graph API request! Status: ${fbResponse.status}`
+            );
+          }
+
+          const fbData = await fbResponse.json();
+          console.log("Facebook Graph API response", fbData);
+
+          const whatsappData = {
+            messaging_product: "whatsapp",
+            to: "91" + studentDetails.phnNo,
+            type: "template",
+            template: {
+              name: "pdf_sender",
+              language: {
+                code: "en",
+              },
+              components: [
+                {
+                  type: "header",
+                  parameters: [
+                    {
+                      type: "document",
+                      document: {
+                        id: fbData.id,
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          };
+
+          const whatsappResponse = await fetch(
+            `https://graph.facebook.com/v18.0/${
+              import.meta.env.VITE_WHATSAPP_ID
+            }/messages`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${import.meta.env.VITE_WHATSAPP_TOKEN}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(whatsappData),
+            }
+          );
+
+          if (!whatsappResponse.ok)
+            throw new Error(
+              `Error sending in whatsapp message sending! Status: ${whatsappResponse.status}`
+            );
+          else {
+            toast.success("Invoice sent successfully via  WhatsApp!");
+          }
 
           if (studentDetails.emailId) {
             const formData = new FormData();

@@ -316,7 +316,8 @@ const Billing = () => {
         const formattedCurrentDate = formatDate(currentDate);
 
         const data = {
-          apiKey: "ndGS8p9qREq8LU72Va2UrraCMRqtThCTGRd9NSRDoTl9RAO7hAmjw2fBnal7KtXi",
+          apiKey:
+            "ndGS8p9qREq8LU72Va2UrraCMRqtThCTGRd9NSRDoTl9RAO7hAmjw2fBnal7KtXi",
           images: {
             // The logo on top of your invoice
             logo: "https://dresscode-invoices.s3.ap-south-1.amazonaws.com/logos/dressCode_Logo.png",
@@ -400,13 +401,18 @@ const Billing = () => {
           );
           whatsappFormData.append("messaging_product", "whatsapp");
 
-          const uploadResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`, {
-            method: "POST",
-            body: pdfFormData,
-          });
+          const uploadResponse = await fetch(
+            `${import.meta.env.VITE_BASE_URL}/billing/uploadToS3`,
+            {
+              method: "POST",
+              body: pdfFormData,
+            }
+          );
 
           if (!uploadResponse.ok) {
-            throw new Error(`HTTP error during upload to S3! Status: ${uploadResponse.status}`);
+            console.error(
+              `HTTP error during upload to S3! Status: ${uploadResponse.status}`
+            );
           }
 
           // const uploadData = await uploadResponse.json();
@@ -427,13 +433,12 @@ const Billing = () => {
           );
 
           if (!fbResponse.ok) {
-            throw new Error(
+            console.error(
               `HTTP error during Facebook Graph API request! Status: ${fbResponse.status}`
             );
           }
 
           const fbData = await fbResponse.json();
-          console.log("Facebook Graph API response", fbData);
 
           const whatsappData = {
             messaging_product: "whatsapp",
@@ -474,11 +479,18 @@ const Billing = () => {
             }
           );
 
-          if (!whatsappResponse.ok)
-            throw new Error(
-              `Error sending in whatsapp message sending! Status: ${whatsappResponse.status}`
+          const whatsappResponseData = await whatsappResponse.json();
+
+          if (!whatsappResponse.ok) {
+            console.error(
+              `Error in sending whatsapp message! status:${whatsappResponse.status}`
             );
-          else {
+            if (whatsappResponseData.error.message.includes("incapable")) {
+              toast.error(
+                `${studentDetails.phnNo} incapable of receving WhatsApp message.`
+              );
+            }
+          } else {
             toast.success("Invoice sent successfully via  WhatsApp!");
           }
 

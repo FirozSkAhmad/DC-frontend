@@ -316,6 +316,7 @@ const Billing = () => {
         const formattedCurrentDate = formatDate(currentDate);
 
         const data = {
+          apiKey: "ndGS8p9qREq8LU72Va2UrraCMRqtThCTGRd9NSRDoTl9RAO7hAmjw2fBnal7KtXi",
           images: {
             // The logo on top of your invoice
             logo: "https://dresscode-invoices.s3.ap-south-1.amazonaws.com/logos/dressCode_Logo.png",
